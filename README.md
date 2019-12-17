@@ -90,7 +90,7 @@ $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 Für die Kommunikation unserer Pods wird ein *Overlay-Netz* genutzt:
 
 ```shell
-$ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+$ kubectl apply -f $HOME/.kube/networking/kube-flannel.yaml
 ```
 
 ### Join-Token
@@ -161,8 +161,56 @@ $ kubectl proxy -p 8005
 Auf dem Rechner über den wir das Dashboard ansehen wollen rufen wir in der Konsole folgendes auf:
 
 ```shell
-$ ssh -L 8005:localhost:8005 k8s-admin@192.168.14.160 -N
+$ ssh -L 8005:localhost:8005 k8s-admin@${ipDesMasterNodes} -N
 ```
 
 Nun haben wir einen SSH-Tunnel der uns ermöglicht über die Adresse: [http://localhost:8005/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/](http://localhost:8005/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) das Dashboard aufzurufen. Nun wird nach der Art der Authentifizierung verlangt wir verwenden hier das zuvor gespeicherte Token[TODO: link].
 
+## Ingress
+Wir nutzen als *Ingress-Controller* nutzen wir *Traefik*.
+### Installation
+Um den Ingress-Controller zu installieren nutzen wir wieder ein DaemonSet und konfigurieren entsprechend einen Service(/-Account).
+```shell
+$ kubectl apply -f $HOME/.kube/ingress/traefik-ds.yaml
+```
+
+
+## Cluster-Level-Logging
+Anlegen des **Logging-Namespaces**.
+```shell
+$ kubectl apply -f $HOME/.kube/logging/logging-ns.yaml
+```
+
+### Elasticsearch
+*Elasticsearch* dient als Speicher-Ort unserer Logs die innerhalb des Clusters anfallen.
+
+#### Installation
+
+```shell
+$ kubectl apply -f $HOME/.kube/logging/elastic.yaml
+```
+
+### Kibana
+*Kibana* liest unsere Logs aus *elasticsearch* aus und visualisiert diese.
+
+#### Installation
+
+Mit diesem Befehl werden Deployments und ein Service erzeugt die Zugriff auf die entsprechenden Pods liefern.
+```shell
+$ kubectl apply -f $HOME/.kube/logging/kibana.yaml
+```
+
+### Fluentd
+*Fluentd* wird mit Hilfe eines *DaemonSets* auf jedem Node installiert. So ist es uns möglich die Logs auf Betriebssystem-Ebene abzufangen und an Elasticsearch weiterzuleiten.
+
+#### Installation
+Wir müssen als erstes Einstellungen vornehmen um Fluentd mit entsprechenden Rechten auszurüsten.
+```shell
+$ kubectl apply -f $HOME/.kube/logging/fluentd-rbac.yaml
+```
+Nun erzeugen wir ein DaemonSet und einen Service für Fluentd.
+
+```shell
+$ kubectl apply -f $HOME/.kube/logging/fluentd-ds.yaml
+$ kubectl apply -f $HOME/.kube/logging/fluentd-service.yaml
+```
