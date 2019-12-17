@@ -93,6 +93,16 @@ Für die Kommunikation unserer Pods wird ein *Overlay-Netz* genutzt:
 $ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
+### Join-Token
+Um einen Node in das Cluster zu integrieren benötigen wir einen sogenannten *Join-Token* mit dem Befehl ``sudo kubeadm init [...]`` haben wir ein solches Token generiert dieses ist jedoch nur 24 Stunden gültig. 
+
+Mit:
+
+```shell
+$ sudo kubeadm token create --print-join-command | tee $HOME/.kube/join-token
+```
+
+erzeugen wir ein neues Join-Token.
 
 ### Kube-Worker
 Auf den Worker-Nodes müssen wir lediglich die zuvor gespeicherte Anweisung ausführen:
@@ -107,3 +117,35 @@ Nun sollten wir mit dem folgenden Befehl, auf dem *kube-master* ausgeführt unse
 ```shell
 $ kubectl get nodes
 ```
+
+### Einen Node aus dem Cluster entfernen
+
+Als erstes müssen wir sicherstellen, dass Pods umgeitet werden und der Master diesem Node nicht noch mehr Workload zuweist. Anschließend weisen wir den Master an den Worker zu entfernen.
+
+
+```shell
+$ kubectl drain ${nodeName} --ignore-daemonsets --delete-local-data
+$ kubectl delete node ${nodeName}
+```
+
+Nun reinigen wir den Worker indem wir auf dem entsprechenden Node folgenden Befehl ausführen:
+
+```shell
+$ kubeadm reset
+```
+
+## Dashboard
+Das Dashboard dient dazu einen Überblick über den Zustand des Clusters zu gewährleisten. Hier können wir unter Anderem erkennen welche Nodes sich im Cluster befinden, welche Deployments auf ihnen betrieben werden und wie deren Status ist. Ebenfalls zuerkennen ist, wo die entsprechenden Container ausgeführt werden. Außerdem können Secrets, Konfigurationen, Jobs und gemeinsamer genutzter Speicher eingesehen werden.
+Bei dem Dashboard handelt es sich, wie bei allem (im Zusammenhang mit K8s), um ein Deployment.
+
+### Installation
+
+Auf dem Master legen wir nun die Cluster
+
+```shell
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta6/aio/deploy/recommended.yaml
+```
+
+### Zugriff
+Um auf das Dashboard über den Browser zugreifen zu können ist es nötig folgende Schritte zu vollziehen.
+Als erstes falls
