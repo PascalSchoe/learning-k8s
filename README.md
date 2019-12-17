@@ -164,5 +164,5 @@ Auf dem Rechner über den wir das Dashboard ansehen wollen rufen wir in der Kons
 $ ssh -L 8005:localhost:8005 k8s-admin@192.168.14.160 -N
 ```
 
-Nun haben wir einen SSH-Tunnel der uns ermöglicht über die Adresse: [http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) das Dashboard aufzurufen. Nun wird nach der Art der Authentifizierung verlangt wir verwenden hier das zuvor gespeicherte Token[TODO: link].
+Nun haben wir einen SSH-Tunnel der uns ermöglicht über die Adresse: [http://localhost:8005/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/](http://localhost:8005/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) das Dashboard aufzurufen. Nun wird nach der Art der Authentifizierung verlangt wir verwenden hier das zuvor gespeicherte Token[TODO: link].
 
