@@ -140,12 +140,29 @@ Bei dem Dashboard handelt es sich, wie bei allem (im Zusammenhang mit K8s), um e
 
 ### Installation
 
-Auf dem Master legen wir nun die Cluster
+Auf dem Master konfigurieren wir nun einen Cluster-Nutzer und seine Rolle, diesen benötigen wir für die Arbeit mit dem Dashboard.
 
 ```shell
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta6/aio/deploy/recommended.yaml
+$ kubectl apply -f $HOME/.kube/dashboard/kubernetes-dashboard-rbac.yaml
+```
+
+Im Anschluss nutzen wir ein Deployment um Dashboard zu installieren. Und anschließend generieren und speichern wir ein *Bearer-Token*.
+```shell
+$ kubectl apply -f $HOME/.kube/dashboard/kubernetes-dashboard-deployment.yaml
+$ kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}') > $HOME/.kube/dashboard/token
 ```
 
 ### Zugriff
 Um auf das Dashboard über den Browser zugreifen zu können ist es nötig folgende Schritte zu vollziehen.
-Als erstes falls
+Als erstes, falls noch nicht geschehen, starten wir die *kubernetes proxy* auf dem Master:
+```shell
+$ kubectl proxy -p 8005
+```
+Auf dem Rechner über den wir das Dashboard ansehen wollen rufen wir in der Konsole folgendes auf:
+
+```shell
+$ ssh -L 8005:localhost:8005 k8s-admin@192.168.14.160 -N
+```
+
+Nun haben wir einen SSH-Tunnel der uns ermöglicht über die Adresse: [http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) das Dashboard aufzurufen. Nun wird nach der Art der Authentifizierung verlangt wir verwenden hier das zuvor gespeicherte Token[TODO: link].
+
