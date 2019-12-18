@@ -260,4 +260,15 @@ Um den Monitoring-Stack zu entfernen:
 ```shell
 $ kubectl delete --ignore-not-found=true -f $HOME/.kube/monitoring/kube-prometheus/manifests/ -f $HOME/.kube/monitoring/kube-prometheus/manifests/setup
 ```
+### Secrets
+#### Docker-Registry
+Um dem Cluster die Zugangsdaten zur Docker-Registry verfügbar zu machen verwenden wir folgenden Befehl:
+
+```shell
+$ kubectl create secret docker-registry --dry-run=true ${secretName} \
+  --docker-server=${DOCKER_REGISTRY_SERVER} \
+  --docker-username=${DOCKER_USER} \
+  --docker-password=${DOCKER_PASSWORD} \
+  --docker-email=${DOCKER_EMAIL} -o yaml | kubectl apply -f -
+```
 
