@@ -174,6 +174,22 @@ Um den Ingress-Controller zu installieren nutzen wir wieder ein DaemonSet und ko
 $ kubectl apply -f $HOME/.kube/ingress/traefik-ds.yaml
 ```
 
+## Storage
+### Lokal
+
+Anlegen eine *StorageClass*
+```shell
+$ kubectl apply -f $HOME/.kube/storage/lacal-sc.yaml
+```
+Anschließend geben wir etwas lokalen Plattenplatz auf jedem Node frei.
+
+```shell
+$ kubectl apply -f $HOME/.kube/storage/kube-worker-01-pv.yaml
+$ kubectl apply -f $HOME/.kube/storage/kube-worker-02-pv.yaml
+```
+
+Nun können wir mit Hilfe von *PersistenVolumeClaims* Cluster-Speicher in Deployments anfordern.
+
 
 ## Cluster-Level-Logging
 Anlegen des **Logging-Namespaces**.
@@ -214,3 +230,34 @@ Nun erzeugen wir ein DaemonSet und einen Service für Fluentd.
 $ kubectl apply -f $HOME/.kube/logging/fluentd-ds.yaml
 $ kubectl apply -f $HOME/.kube/logging/fluentd-service.yaml
 ```
+
+### Ingress
+[TODO]
+
+## Monitoring
+Als Monitoring-Stack nutzen wir ein recht komplexes Setup welches *Grafana* und *Prometheus* nutzt hier sind viele 'Schraubstellen' um das System zu konfigurieren. Als Basis nutzen wir das Projekt: [kube-prometheus](https://github.com/coreos/kube-prometheus), es wurden einige Anpassungen vorgenommen um, zum Beispiel, eine PersistenVolumeClaim zu verwenden.
+
+
+### Installation
+```shell
+$ kubectl apply -f $HOME/.kube/monitoring/grafana-pvc.yaml
+$ kubectl apply -f $HOME/.kube/monitoring/kube-prometheus/manifests/setup/
+```
+
+Da wir in dem letzten Befehl *CustomResourceDefinitions* anlegen müssen wir etwas Zeit verstreichen lassen da es andernfalls zu Raceconditions kommen könnte. Anschließend legen wir den Stack an.
+
+```shell
+$ kubectl apply -f $HOME/.kube/monitoring/kube-prometheus/manifests/
+```
+
+### Ingress
+[TODO]
+
+
+### Löschen
+Um den Monitoring-Stack zu entfernen:
+
+```shell
+$ kubectl delete --ignore-not-found=true -f $HOME/.kube/monitoring/kube-prometheus/manifests/ -f $HOME/.kube/monitoring/kube-prometheus/manifests/setup
+```
+
