@@ -131,7 +131,7 @@ $ kubectl delete node ${nodeName}
 Nun reinigen wir den Worker indem wir auf dem entsprechenden Node folgenden Befehl ausführen:
 
 ```shell
-$ kubeadm reset
+$ sudo kubeadm reset
 ```
 
 ## Dashboard
@@ -179,7 +179,7 @@ $ kubectl apply -f $HOME/.kube/ingress/traefik-ds.yaml
 
 Anlegen eine *StorageClass*
 ```shell
-$ kubectl apply -f $HOME/.kube/storage/lacal-sc.yaml
+$ kubectl apply -f $HOME/.kube/storage/local-sc.yaml
 ```
 Anschließend geben wir etwas lokalen Plattenplatz auf jedem Node frei.
 
