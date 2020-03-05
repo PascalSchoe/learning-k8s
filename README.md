@@ -171,6 +171,9 @@ Wir nutzen als *Ingress-Controller* nutzen wir *Traefik*.
 ### Installation
 Um den Ingress-Controller zu installieren nutzen wir wieder ein DaemonSet und konfigurieren entsprechend einen Service(/-Account).
 ```shell
+$ kubectl create configmap traefik-conf --from-file=$HOME/.kube/ingress/traefik.toml
+$ kubectl -n default create secret tls papermill-tls-cert --key=$HOME/.kube/ingress/certs/tls.key --cert=$HOME/.kube/ingress/certs/tls.crt
+$ kubectl apply -f $HOME/.kube/ingress/traefik-rbac.yaml
 $ kubectl apply -f $HOME/.kube/ingress/traefik-ds.yaml
 ```
 
